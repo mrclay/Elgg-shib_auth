@@ -1,3 +1,5 @@
+**Warning:** This codebase has been overhauled a bit without testing. Use at your own risk :)
+
 **Note:** Rename this folder to `shib_auth` in Elgg's mod directory.
 
 # shib_auth
@@ -16,10 +18,9 @@ Within that directory, Apache must expose Shibboleth attributes in `$_SERVER`
 
 ## How it works
 
-Shibboleth users must register & login via `<elgg_URL>/mod/shib_auth/`. When Shibboleth users register, their username is taken from a member of `$_SERVER`, metadata is added to their account so they can be recognized as a shib_auth user
-in the future, and their password is set to a long random string to make their account inaccessible from other login methods.
+Shibboleth users must register & login via `<elgg_URL>/shib_auth/login`. When Shibboleth users register, their username is taken from a member of `$_SERVER`, metadata is added to their account so they can be recognized as a shib_auth user in the future, and their password is set to a long random string to make their account inaccessible from other login methods.
 
-Users should be directed to `<elgg_URL>/mod/shib_auth/logout.php` to logout.
+To log out, direct users to `<elgg_URL>/shib_auth/logout`.
 
 ### Caveats
 
@@ -28,12 +29,12 @@ In the included Shib_DefaultConfig class, the shib_auth private setting is requi
 ## Setup
 
  1. Place this folder in `<elgg_path>/mod`
- 2. Make a custom configuration class for your site based on Shib/DefaultConfig.php. This must extend Shib_AbstractConfig (or Shib_DefaultConfig). Take a look at Shib/AbstractConfig.php to get an idea of what hooks are available during the login & logout processes, and Shib.php to see in what order they're called.
+ 2. Make a custom configuration class for your site by extending the Shib_DefaultConfig class (which implements Shib_IConfig). The default methods should give you an idea of what hooks are available during the login & logout processes, and see the Shib_Core class to see in what order they're called.
 
-    You'll definitely need to customize getRegistationDetails() and sniffUsername() so they return the right keys from $_SERVER.
+    You'll definitely need to override getRegistationDetails() and getShibUsername() so they return the right keys from $_SERVER.
 
- 3. Edit config.php so that the function shibAuth_getConfigObject() creates and returns your site's configuration object.
- 4. Send Shibboleth users to `<elgg_URL>/mod/shib_auth/` to log in or register, and to `<elgg_URL>/mod/shib_auth/logout.php` to log out.
+ 3. Edit config.php so that the function shib_auth_get_config() creates and returns your site's configuration object.
+ 4. Send Shibboleth users to `<elgg_URL>/shib_auth/login` to log in or register, and to `<elgg_URL>/shib_auth/logout` to log out.
  5. You should probably recommend upon logging out that the user completely exit their browser. Otherwise they may remain logged in at the shibboleth IdP site.
 
 ### TODO

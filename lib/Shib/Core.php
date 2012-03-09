@@ -1,20 +1,31 @@
 <?php
 
-class Shib {
+class Shib_Core {
 
-    public function validate(Shib_AbstractConfig $conf)
+    protected $loginReferer = '';
+
+    /**
+     * @return string
+     */
+    public function getLoginReferer()
     {
+        return $this->loginReferer;
+    }
+
+    public function validate(Shib_IConfig $conf)
+    {
+        $conf->setCore($this);
+
         if (isset($_SESSION['ELGG_SHIB_AUTH_REFERER'])) {
-            $conf->loginReferer = $_SESSION['ELGG_SHIB_AUTH_REFERER'];
+            $this->loginReferer = $_SESSION['ELGG_SHIB_AUTH_REFERER'];
             unset($_SESSION['ELGG_SHIB_AUTH_REFERER']);
         }
 
-        if (isloggedin()) {
+        if (elgg_is_logged_in()) {
             $conf->loggedInAlready();
         }
-
-        $conf->sniffUsername();
-        $shibUser = $conf->username;
+        
+        $shibUser = $conf->getShibUsername();
 
         if (empty($shibUser)) {
             return $conf->onEmptyUsername();
@@ -24,15 +35,16 @@ class Shib {
         if ($user) {
             $isValid = $conf->belongsToShibUser($user);
             if ($isValid) {
-                login($user, $conf->persistentLogins);
+                $conf->preLogin($user);
+                login($user, $conf->getLoginPersistent());
                 return $conf->postLogin($user);
             } else {
                 return $conf->onInvalidUser($user);
             }
         }
-
+        
         // create account
-
+        
         $regDetails = $conf->getRegistationDetails();
         if (! isset($regDetails['friendGuid']) || ! $regDetails['friendGuid']) {
             $regDetails['friendGuid'] = 0;
@@ -57,13 +69,13 @@ class Shib {
                 $password,
                 $regDetails['name'],
                 $regDetails['mail'],
-                false,
+                $conf->getAllowAccountsWithSameEmail(),
                 $regDetails['friendGuid']
             );
         }
         if ($guid) {
             $user = get_user($guid); // http://reference.elgg.org/lib_2users_8php.html#893f378cc151ca0a9ca94640b18b086a
-            login($user, $conf->$persistentLogins); // http://reference.elgg.org/sessions_8php.html#f3098385f445c6f8136ab7e4ce7819c9
+            login($user, $conf->getLoginPersistent()); // http://reference.elgg.org/sessions_8php.html#f3098385f445c6f8136ab7e4ce7819c9
             return $conf->postRegister($user);
         } else {
             // user couldn't be registered!
@@ -71,10 +83,12 @@ class Shib {
         }
     }
 
-    public function logout(Shib_AbstractConfig $conf)
+    public function logout(Shib_IConfig $conf)
     {
-	    if (isloggedin()) {
-            $conf->preLogout(get_loggedin_user());
+        $conf->setCore($this);
+
+        if (elgg_is_logged_in()) {
+            $conf->preLogout(elgg_get_logged_in_user_entity());
             logout();
             $conf->postLogout();
         }

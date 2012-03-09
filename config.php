@@ -3,12 +3,9 @@
 /*
  * Return your site-specific config object
  *
- * @return Shib_AbstractConfig
+ * @return Shib_IConfig
  */
-function shibAuth_getConfigObject() {
-
-    require_once dirname(__FILE__) . '/Shib/DefaultConfig.php';
-
+function shib_auth_get_config() {
     return new Shib_DefaultConfig();
 }
 
