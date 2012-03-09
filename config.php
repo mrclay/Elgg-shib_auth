@@ -6,6 +6,13 @@
  * @return Shib_IConfig
  */
 function shib_auth_get_config() {
-    return new Shib_DefaultConfig();
+    return new MyShibConfig();
 }
 
+/**
+ * Override methods as necessary. getRegistationDetails() and
+ * getShibUsername() are usually essential.
+ */
+class MyShibConfig extends Shib_DefaultConfig {
+
+}

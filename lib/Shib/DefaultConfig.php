@@ -18,7 +18,7 @@ class Shib_DefaultConfig implements Shib_IConfig {
      *
      * @var bool
      */
-    private $_requireShibAuthFlag = true;
+    protected $_requireShibAuthFlag = true;
 
     /**
      * @var Shib_Core

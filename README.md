@@ -29,13 +29,12 @@ In the included Shib_DefaultConfig class, the shib_auth private setting is requi
 ## Setup
 
  1. Place this folder in `<elgg_path>/mod`
- 2. Make a custom configuration class for your site by extending the Shib_DefaultConfig class (which implements Shib_IConfig). The default methods should give you an idea of what hooks are available during the login & logout processes, and see the Shib_Core class to see in what order they're called.
+ 2. Edit config.php to customize your configuration class MyShibConfig, which extends the Shib_DefaultConfig class. Shib_DefaultConfig should give you an idea of what hooks are available during the login & logout processes, and see the Shib_Core class to see in what order they're called.
 
     You'll definitely need to override getRegistationDetails() and getShibUsername() so they return the right keys from $_SERVER.
 
- 3. Edit config.php so that the function shib_auth_get_config() creates and returns your site's configuration object.
- 4. Send Shibboleth users to `<elgg_URL>/shib_auth/login` to log in or register, and to `<elgg_URL>/shib_auth/logout` to log out.
- 5. You should probably recommend upon logging out that the user completely exit their browser. Otherwise they may remain logged in at the shibboleth IdP site.
+ 3. Send Shibboleth users to `<elgg_URL>/shib_auth/login` to log in or register, and to `<elgg_URL>/shib_auth/logout` to log out.
+ 4. You should probably recommend upon logging out that the user completely exit their browser. Otherwise they may remain logged in at the shibboleth IdP site.
 
 ### TODO
 
