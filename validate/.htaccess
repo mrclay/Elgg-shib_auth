@@ -1,0 +1,6 @@
+# Shib authentication required for access (according to Require)
+# the shib session keys will be present in $_SERVER 
+#
+AuthType shibboleth
+ShibRequireSession On
+Require valid-user
