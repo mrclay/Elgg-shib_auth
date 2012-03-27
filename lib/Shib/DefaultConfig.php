@@ -56,8 +56,6 @@ class Shib_DefaultConfig implements Shib_IConfig {
         $this->core = $core;
     }
 
-
-
     public function belongsToShibUser(ElggUser $user)
     {
         if ($this->_requireShibAuthFlag) {
@@ -70,31 +68,17 @@ class Shib_DefaultConfig implements Shib_IConfig {
     public function postRegister(ElggUser $user)
     {
         $user->setPrivateSetting('shib_auth', '1');
-        parent::postRegister($user);
+        system_message(elgg_echo("registerok", array(elgg_get_site_entity()->name)));
     }
 
     public function postLogin(ElggUser $user)
     {
         system_message(elgg_echo('loginok'));
-
-        // forward user to same page if coming from Elgg site
-        $dest = '';
-        $referer = $this->core->getLoginReferer();
-        if (0 === strpos($referer, elgg_get_site_url())) {
-            $dest = $referer;
-        }
-        forward($dest);
     }
 
     public function postLogout()
     {
-        // deletes Elgg and local shib cookies for your SP
-        setcookie('Elgg', '', time() - 86400, '/');
-        foreach ($_COOKIE as $key => $val) {
-            if (0 === strpos($key, '_shib')) {
-                setcookie($key, '', time() - 86400, '/');
-            }
-        }
+        $this->core->removeSpCookies();
     }
 
     /*

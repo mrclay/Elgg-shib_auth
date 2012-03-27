@@ -3,7 +3,9 @@
 function shib_auth_init() {
     spl_autoload_register('shib_auth_loader');
 
-    elgg_register_page_handler('shib_auth','shib_auth_page');
+    elgg_register_page_handler('shib_auth', 'shib_auth_page');
+
+    elgg_register_event_handler('logout', 'user', 'shib_auth_handle_logout');
 }
 
 function shib_auth_page($page) {
@@ -26,6 +28,7 @@ function shib_auth_page($page) {
             // not listed in Metadata
             forward(str_replace('http://', 'https://', elgg_get_site_url() . 'mod/shib_auth/validate/'));
         } elseif ($page[0] === 'logout') {
+            elgg_unregister_event_handler('logout', 'user', 'shib_auth_handle_logout');
             shib_auth_execute_method('logout');
         }
     }
@@ -48,6 +51,17 @@ function shib_auth_loader($className) {
         }
     }
     return false;
+}
+
+/**
+ * @param string $event
+ * @param string $type
+ * @param object $user
+ * @return bool
+ */
+function shib_auth_handle_logout($event, $type, $user) {
+    forward('shib_auth/logout');
+    return true;
 }
 
 elgg_register_event_handler('init', 'system', 'shib_auth_init');

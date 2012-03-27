@@ -28,7 +28,8 @@ class Shib_Core {
         $shibUser = $conf->getShibUsername();
 
         if (empty($shibUser)) {
-            return $conf->onEmptyUsername();
+            $conf->onEmptyUsername();
+            return null;
         }
 
         $user = get_user_by_username($shibUser);
@@ -37,9 +38,11 @@ class Shib_Core {
             if ($isValid) {
                 $conf->preLogin($user);
                 login($user, $conf->getLoginPersistent());
-                return $conf->postLogin($user);
+                $conf->postLogin($user);
+                $this->forwardToReferer();
             } else {
-                return $conf->onInvalidUser($user);
+                $conf->onInvalidUser($user);
+                return null;
             }
         }
         
@@ -76,10 +79,11 @@ class Shib_Core {
         if ($guid) {
             $user = get_user($guid); // http://reference.elgg.org/lib_2users_8php.html#893f378cc151ca0a9ca94640b18b086a
             login($user, $conf->getLoginPersistent()); // http://reference.elgg.org/sessions_8php.html#f3098385f445c6f8136ab7e4ce7819c9
-            return $conf->postRegister($user);
+            $conf->postRegister($user);
+            $this->forwardToReferer();
         } else {
             // user couldn't be registered!
-            return $conf->onRegistrationFailure();
+            $conf->onRegistrationFailure();
         }
     }
 
@@ -93,5 +97,36 @@ class Shib_Core {
             $conf->postLogout();
         }
         forward();
+    }
+
+    /**
+     * @param string $referer
+     * @param bool $mustBeWithinSite
+     */
+    public function forwardToReferer($referer = null, $mustBeWithinSite = true)
+    {
+        $dest = '';
+        if (! $referer) {
+            $referer = $this->getLoginReferer();
+        }
+        if ($mustBeWithinSite) {
+            $pattern = '@^' . preg_quote(elgg_get_site_url(), '@') . '(.+)@';
+            $pattern = str_replace(array('@^http\\:', '@^https\\:'), '@^https?\\:', $pattern);
+            if (preg_match($pattern, $referer, $m)) {
+                $dest = $m[1];
+            }
+        } else {
+            $dest = $referer;
+        }
+        forward($dest);
+    }
+
+    public function removeSpCookies()
+    {
+        foreach ($_COOKIE as $key => $val) {
+            if (0 === strpos($key, '_shib')) {
+                setcookie($key, ini_get('session.cookie_domain'), time() - 86400, '/');
+            }
+        }
     }
 }
