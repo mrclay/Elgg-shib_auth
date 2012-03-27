@@ -6,6 +6,8 @@ function shib_auth_init() {
     elgg_register_page_handler('shib_auth', 'shib_auth_page');
 
     elgg_register_event_handler('logout', 'user', 'shib_auth_handle_logout');
+
+    elgg_extend_view('forms/login', 'shib_auth/after/forms/login', 501);
 }
 
 function shib_auth_page($page) {
