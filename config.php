@@ -38,9 +38,8 @@ class MyShibConfig extends Shib_DefaultConfig {
 
     public function postLogout()
     {
-        $loc = isset($_GET['js'])
-            ? elgg_get_site_url() . "#loggedOut"
-            : "http://" . $_SERVER['SERVER_NAME'] . "/distance-learning/logged-out/";
+        $loc = elgg_get_site_url() . "#loggedOut";
+        // non-JS option: "http://" . $_SERVER['SERVER_NAME'] . "/distance-learning/logged-out/";
         setcookie('mdlLastCourse', '', time() - 86400, '/', '.education.ufl.edu');
         $this->core->removeSpCookies();
         forward($loc);
