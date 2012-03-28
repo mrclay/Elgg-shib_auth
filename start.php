@@ -21,9 +21,11 @@ function shib_auth_page($page) {
             // can save a redirect by sending the user directly to 'mod/shib_auth/validate/'.
 
             // available via $this->loginReferer in your config object
-            $_SESSION['ELGG_SHIB_AUTH_REFERER'] = isset($_GET['referer'])
-                ? $_GET['referer']
-                : REFERER;
+            if (isset($_GET['referer'])) {
+                $_SESSION['ELGG_SHIB_AUTH_REFERER'] = (string) $_GET['referer'];
+            } elseif (! empty($_SERVER['HTTP_REFERER'])) {
+                $_SESSION['ELGG_SHIB_AUTH_REFERER'] = $_SERVER['HTTP_REFERER'];
+            }
 
             // forward to URL protected by Shibboleth module (may run index.php or forward to IdP).
             // HTTPS is forced because IdP may not allow redirects to an insecure endpoint that's
