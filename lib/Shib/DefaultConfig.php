@@ -37,11 +37,9 @@ class Shib_DefaultConfig implements Shib_IConfig {
 
     public function getRegistationDetails()
     {
-        return array(
-            'name' => $_SERVER['shib-fullname'],
-            'mail' => $_SERVER['shib-mail'],
-            'friendGuid' => 0,
-        );
+        $details = new Shib_RegDetails();
+        $details->name = $_SERVER['shib-fullname'];
+        return $details;
     }
 
     public function getShibUsername()

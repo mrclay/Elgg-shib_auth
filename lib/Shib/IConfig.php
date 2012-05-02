@@ -24,19 +24,7 @@ interface Shib_IConfig {
     public function getAllowAccountsWithSameEmail();
 
     /*
-     * Must return an array w/ keys 'name', 'mail', and 'friendGuid' to be passed
-     * to Elgg's register_user() function.
-     *
-     * E.g.
-     * <code>
-     * return array(
-     *     'name' => $_SERVER['shib-fullName'],
-     *     'mail' => $_SERVER['shib-mail'],
-     *     'friendGuid' => 0, // default
-     * );
-     * </code>
-     *
-     * @return array
+     * @return Shib_RegDetails
      */
     public function getRegistationDetails();
 

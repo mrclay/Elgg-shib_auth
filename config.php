@@ -72,11 +72,10 @@ class MyShibConfig extends Shib_DefaultConfig {
             $this->_businessEmailMissing = true;
             $mail = "$glid@ufl.edu";
         }
-        return array(
-            'name' => $name,
-            'mail' => $mail,
-            'friendGuid' => 0,
-        );
+        $ret = new Shib_RegDetails();
+        $ret->mail = $mail;
+        $ret->name = $name;
+        return $ret;
     }
 
     protected function _nameFromCn($cn)
