@@ -40,7 +40,7 @@ function shib_auth_page($page) {
 
 function shib_auth_execute_method($name) {
     if (! function_exists('shib_auth_get_config')) {
-        require __DIR__ . '/config.php';
+        require dirname(__FILE__) . '/config.php';
     }
     $core = new Shib_Core();
     $core->$name(shib_auth_get_config());
@@ -48,13 +48,11 @@ function shib_auth_execute_method($name) {
 
 function shib_auth_loader($className) {
     if (0 === strpos($className, 'Shib_')) {
-        $path = __DIR__ . '/lib/' . str_replace(array('_', '\\'), '/', $className) . '.php';
+        $path = dirname(__FILE__) . '/lib/' . str_replace(array('_', '\\'), '/', $className) . '.php';
         if (is_readable($path)) {
             require $path;
-            return true;
         }
     }
-    return false;
 }
 
 /**
@@ -65,7 +63,6 @@ function shib_auth_loader($className) {
  */
 function shib_auth_handle_logout($event, $type, $user) {
     forward('shib_auth/logout');
-    return true;
 }
 
 elgg_register_event_handler('init', 'system', 'shib_auth_init');
