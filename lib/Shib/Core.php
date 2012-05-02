@@ -49,16 +49,14 @@ class Shib_Core {
         // create account
         
         $regDetails = $conf->getRegistationDetails();
-        if (! isset($regDetails['friendGuid']) || ! $regDetails['friendGuid']) {
-            $regDetails['friendGuid'] = 0;
-        }
-        if (empty($regDetails['mail']) || empty($regDetails['name'])) {
+        /* @var Shib_RegDetails $regDetails */
+        if (empty($regDetails->mail) || empty($regDetails->name)) {
             // uh oh
             $guid = false;
-            if (empty($regDetails['mail'])) {
+            if (empty($regDetails->mail)) {
                 $conf->onEmptyRegistrationMail();
             }
-            if (empty($regDetails['name'])) {
+            if (empty($regDetails->name)) {
                 $conf->onEmptyRegistrationName();
             }
         } else {
@@ -70,10 +68,10 @@ class Shib_Core {
             $guid = register_user(
                 $shibUser,
                 $password,
-                $regDetails['name'],
-                $regDetails['mail'],
+                $regDetails->name,
+                $regDetails->mail,
                 $conf->getAllowAccountsWithSameEmail(),
-                $regDetails['friendGuid']
+                $regDetails->friendGuid
             );
         }
         if ($guid) {
