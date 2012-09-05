@@ -21,15 +21,17 @@ function shib_auth_page($page) {
             // can save a redirect by sending the user directly to 'mod/shib_auth/validate/'.
 
             // available via $this->loginReferer in your config object
-            if (isset($_GET['referer'])) {
+			if (!empty($_SESSION['last_forward_from'])) {
+				$_SESSION['ELGG_SHIB_AUTH_REFERER'] = $_SESSION['last_forward_from'];
+				unset($_SESSION['last_forward_from']);
+			} elseif (!empty($_GET['referer'])) {
                 $_SESSION['ELGG_SHIB_AUTH_REFERER'] = (string) $_GET['referer'];
-            } elseif (! empty($_SERVER['HTTP_REFERER'])) {
+            } elseif (!empty($_SERVER['HTTP_REFERER'])) {
                 $_SESSION['ELGG_SHIB_AUTH_REFERER'] = $_SERVER['HTTP_REFERER'];
             }
 
             // forward to URL protected by Shibboleth module (may run index.php or forward to IdP).
-            // HTTPS is forced because IdP may not allow redirects to an insecure endpoint that's
-            // not listed in Metadata
+            // HTTPS is forced because IdP's usually require secure endpoints
             forward(str_replace('http://', 'https://', elgg_get_site_url() . 'mod/shib_auth/validate/'));
         } elseif ($page[0] === 'logout') {
             elgg_unregister_event_handler('logout', 'user', 'shib_auth_handle_logout');
@@ -39,11 +41,13 @@ function shib_auth_page($page) {
 }
 
 function shib_auth_execute_method($name) {
-    if (! function_exists('shib_auth_get_config')) {
-        require dirname(__FILE__) . '/config.php';
-    }
     $core = new Shib_Core();
-    $core->$name(shib_auth_get_config());
+	$config = elgg_trigger_plugin_hook('shib_auth:fetch', 'config', array(), null);
+	if (!$config instanceof Shib_IConfig) {
+		register_error('[shib_auth:fetch, config] hook must return an object that implements Shib_IConfig');
+		forward('');
+	}
+    $core->$name($config);
 }
 
 function shib_auth_loader($className) {

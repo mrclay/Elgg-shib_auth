@@ -16,14 +16,9 @@ class Shib_Core {
     {
         $conf->setCore($this);
 
-        if (!empty($_SESSION['last_forward_from'])) {
-            $this->loginReferer = $_SESSION['last_forward_from'];
-            unset($_SESSION['last_forward_from']);
-        } elseif (!empty($_SESSION['ELGG_SHIB_AUTH_REFERER'])) {
-            $this->loginReferer = $_SESSION['ELGG_SHIB_AUTH_REFERER'];
-        }
         if (!empty($_SESSION['ELGG_SHIB_AUTH_REFERER'])) {
-            unset($_SESSION['ELGG_SHIB_AUTH_REFERER']);
+            $this->loginReferer = $_SESSION['ELGG_SHIB_AUTH_REFERER'];
+			unset($_SESSION['ELGG_SHIB_AUTH_REFERER']);
         }
 
         if (elgg_is_logged_in()) {
