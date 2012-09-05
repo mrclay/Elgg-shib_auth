@@ -39,6 +39,7 @@ class Shib_DefaultConfig implements Shib_IConfig {
     {
         $details = new Shib_RegDetails();
         $details->name = $_SERVER['shib-fullname'];
+        $details->mail = $_SERVER['shib-mail'];
         return $details;
     }
 
