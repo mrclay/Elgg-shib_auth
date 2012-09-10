@@ -65,14 +65,18 @@ class Shib_Core {
                       . microtime(true);
 
             // http://reference.elgg.org/lib_2users_8php.html#bb0a317e866cf8c6c4770f6376b56df9
-            $guid = register_user(
-                $shibUser,
-                $password,
-                $regDetails->name,
-                $regDetails->mail,
-                $conf->getAllowAccountsWithSameEmail(),
-                $regDetails->friendGuid
-            );
+			try {
+				$guid = register_user(
+					$shibUser,
+					$password,
+					$regDetails->name,
+					$regDetails->mail,
+					$conf->getAllowAccountsWithSameEmail(),
+					$regDetails->friendGuid
+				);
+			} catch (RegistrationException $e) {
+				$guid = false;
+			}
         }
         if ($guid) {
             $user = get_user($guid); // http://reference.elgg.org/lib_2users_8php.html#893f378cc151ca0a9ca94640b18b086a
