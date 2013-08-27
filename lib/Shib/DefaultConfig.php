@@ -64,6 +64,10 @@ class Shib_DefaultConfig implements Shib_IConfig {
         }
     }
 
+	public function canRegister(Shib_RegDetails $regDetails) {
+		return true;
+	}
+
     public function postRegister(ElggUser $user)
     {
         $user->setPrivateSetting('shib_auth', '1');

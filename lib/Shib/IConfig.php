@@ -86,6 +86,14 @@ interface Shib_IConfig {
      */
     public function onEmptyRegistrationName();
 
+	/**
+	 * Can an account be created for this user?
+	 *
+	 * @param Shib_RegDetails $regDetails
+	 * @return bool
+	 */
+	public function canRegister(Shib_RegDetails $regDetails);
+
     /*
      * Called before Elgg user is logged in. If you don't want the user to login,
      * redirect away...

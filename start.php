@@ -8,6 +8,24 @@ function shib_auth_init() {
     elgg_register_event_handler('logout', 'user', 'shib_auth_handle_logout');
 
     elgg_extend_view('forms/login', 'shib_auth/after/forms/login', 501);
+	if (elgg_is_active_plugin('maintenance')) {
+		elgg_register_plugin_hook_handler('maintenance:allow', 'url', 'shib_auth_maintenance_allow_url');
+	}
+
+	elgg_register_plugin_hook_handler('public_pages', 'walled_garden', function ($h, $t, $v, $p) {
+		$v[] = '(mod/)?shib_auth/.*';
+		return $v;
+	});
+}
+
+// compatibility w/ maintenance plugin
+function shib_auth_maintenance_allow_url($hook, $type, $allow, $params) {
+	if (0 === strpos($params['current_path'], 'shib_auth/')
+		|| 0 === strpos($params['current_path'], 'mod/shib_auth/validate/index.php')
+	) {
+		return true;
+	}
+	return $allow;
 }
 
 function shib_auth_page($page) {
@@ -29,6 +47,9 @@ function shib_auth_page($page) {
             } elseif (!empty($_SERVER['HTTP_REFERER'])) {
                 $_SESSION['ELGG_SHIB_AUTH_REFERER'] = $_SERVER['HTTP_REFERER'];
             }
+			if ($_SESSION['ELGG_SHIB_AUTH_REFERER'] === elgg_get_site_url()) {
+				unset($_SESSION['ELGG_SHIB_AUTH_REFERER']);
+			}
 
             // forward to URL protected by Shibboleth module (may run index.php or forward to IdP).
             // HTTPS is forced because IdP's usually require secure endpoints

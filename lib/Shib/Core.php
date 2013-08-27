@@ -50,6 +50,12 @@ class Shib_Core {
         
         $regDetails = $conf->getRegistationDetails();
         /* @var Shib_RegDetails $regDetails */
+
+		if (!$conf->canRegister($regDetails)) {
+			$conf->onRegistrationFailure();
+			return;
+		}
+
         if (empty($regDetails->mail) || empty($regDetails->name)) {
             // uh oh
             $guid = false;
@@ -66,6 +72,9 @@ class Shib_Core {
 
             // http://reference.elgg.org/lib_2users_8php.html#bb0a317e866cf8c6c4770f6376b56df9
 			try {
+				// disable stronger_password requirements
+				elgg_unregister_plugin_hook_handler('registeruser:validate:password', 'all', '_stronger_passwords_validate_password');
+
 				$guid = register_user(
 					$shibUser,
 					$password,
